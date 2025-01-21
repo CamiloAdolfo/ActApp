@@ -1,8 +1,8 @@
-'use client'
+"use client"
 
-import React, { useState } from 'react'
-import { useForm, Controller } from 'react-hook-form'
-import { Combobox } from '@headlessui/react' 
+import React, { useState } from "react"
+import { useForm, Controller } from "react-hook-form"
+import { Combobox } from "@headlessui/react"
 
 type FormData = {
   numeroActa: string
@@ -32,11 +32,29 @@ const lugares = [
 ]
 
 const comunas = [
-  "Comuna 1", "Comuna 2", "Comuna 3", "Comuna 4", "Comuna 5",
-  "Comuna 6", "Comuna 7", "Comuna 8", "Comuna 9", "Comuna 10",
-  "Comuna 11", "Comuna 12", "Comuna 13", "Comuna 14", "Comuna 15",
-  "Comuna 16", "Comuna 17", "Comuna 18", "Comuna 19", "Comuna 20",
-  "Comuna 21", "Comuna 22", "Corregimiento Montebello"
+  "Comuna 1",
+  "Comuna 2",
+  "Comuna 3",
+  "Comuna 4",
+  "Comuna 5",
+  "Comuna 6",
+  "Comuna 7",
+  "Comuna 8",
+  "Comuna 9",
+  "Comuna 10",
+  "Comuna 11",
+  "Comuna 12",
+  "Comuna 13",
+  "Comuna 14",
+  "Comuna 15",
+  "Comuna 16",
+  "Comuna 17",
+  "Comuna 18",
+  "Comuna 19",
+  "Comuna 20",
+  "Comuna 21",
+  "Comuna 22",
+  "Corregimiento Montebello",
 ]
 
 const asistentesDB = [
@@ -54,52 +72,50 @@ const asistentesDB = [
   "Walter Sánchez - Contratista",
   "Rigoberto Guerrero - Contratista",
   "Paula Lenis - Contratista",
-  "Diego Camacho - Contratista"
+  "Diego Camacho - Contratista",
 ]
 
-const meses = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic']
-const dias = Array.from({length: 31}, (_, i) => (i + 1).toString().padStart(2, '0'))
-const anos = Array.from({length: 21}, (_, i) => (2020 + i).toString())
-const horas = Array.from({length: 12}, (_, i) => (i + 1).toString().padStart(2, '0'))
-const minutos = Array.from({length: 60}, (_, i) => i.toString().padStart(2, '0'))
+const meses = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"]
+const dias = Array.from({ length: 31 }, (_, i) => (i + 1).toString().padStart(2, "0"))
+const anos = Array.from({ length: 21 }, (_, i) => (2020 + i).toString())
+const horas = Array.from({ length: 12 }, (_, i) => (i + 1).toString().padStart(2, "0"))
+const minutos = Array.from({ length: 60 }, (_, i) => i.toString().padStart(2, "0"))
 
 export default function ActaForm() {
   const { register, control, handleSubmit, watch, setValue } = useForm<FormData>({
     defaultValues: {
-      numeroActa: '',
-      fechaDia: '',
-      fechaMes: '',
-      fechaAno: '',
-      horaInicial: '',
-      minutoInicial: '',
-      periodoInicial: '',
-      horaFinal: '',
-      minutoFinal: '',
-      periodoFinal: '',
-      comuna: '',
-      lugar: '',
-      objetivo: '',
-      ordenDelDia: [''],
-      desarrollo: '',
-      asistentes: ['', '']
-    }
+      numeroActa: "",
+      fechaDia: "",
+      fechaMes: "",
+      fechaAno: "",
+      horaInicial: "",
+      minutoInicial: "",
+      periodoInicial: "",
+      horaFinal: "",
+      minutoFinal: "",
+      periodoFinal: "",
+      comuna: "",
+      lugar: "",
+      objetivo: "",
+      ordenDelDia: [""],
+      desarrollo: "",
+      asistentes: ["", ""],
+    },
   })
-  const [queryLugar, setQueryLugar] = useState('')
-  const [queryComuna, setQueryComuna] = useState('')
-  const [queryAsistentes, setQueryAsistentes] = useState(['', ''])
+  const [queryLugar, setQueryLugar] = useState("")
+  const [queryComuna, setQueryComuna] = useState("")
+  const [queryAsistentes, setQueryAsistentes] = useState(["", ""])
 
-  const filteredLugares = queryLugar === '' ? lugares : lugares.filter((lugar) =>
-    lugar.toLowerCase().includes(queryLugar.toLowerCase())
-  )
+  const filteredLugares =
+    queryLugar === "" ? lugares : lugares.filter((lugar) => lugar.toLowerCase().includes(queryLugar.toLowerCase()))
 
-  const filteredComunas = queryComuna === '' ? comunas : comunas.filter((comuna) =>
-    comuna.toLowerCase().includes(queryComuna.toLowerCase())
-  )
+  const filteredComunas =
+    queryComuna === "" ? comunas : comunas.filter((comuna) => comuna.toLowerCase().includes(queryComuna.toLowerCase()))
 
-  const filteredAsistentes = (query: string) => 
-    query === '' ? asistentesDB : asistentesDB.filter((asistente) =>
-      asistente.toLowerCase().includes(query.toLowerCase())
-    )
+  const filteredAsistentes = (query: string) =>
+    query === ""
+      ? asistentesDB
+      : asistentesDB.filter((asistente) => asistente.toLowerCase().includes(query.toLowerCase()))
 
   const onSubmit = async (data: FormData) => {
     try {
@@ -108,21 +124,14 @@ export default function ActaForm() {
         fecha: `${data.fechaDia}/${data.fechaMes}/${data.fechaAno}`,
         horaInicial: `${data.horaInicial}:${data.minutoInicial} ${data.periodoInicial}`,
         horaFinal: `${data.horaFinal}:${data.minutoFinal} ${data.periodoFinal}`,
-        ordenDelDia: data.ordenDelDia.reduce((acc, item, index) => {
-          acc[`ordenDelDia${index + 1}`] = item;
-          return acc;
-        }, {} as Record<string, string>),
-        asistentes: data.asistentes.reduce((acc, item, index) => {
-          if (item) {
-            acc[`asistentes${index + 1}`] = item;
-          }
-          return acc;
-        }, {} as Record<string, string>)
+        ordenDelDia: data.ordenDelDia.filter(Boolean),
+        asistentes: data.asistentes.filter(Boolean),
       }
-      const response = await fetch('/api/submit-acta', {
-        method: 'POST',
+
+      const response = await fetch("/api/submit-acta", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify(formattedData),
       })
@@ -130,44 +139,52 @@ export default function ActaForm() {
       if (response.ok) {
         const blob = await response.blob()
         const url = window.URL.createObjectURL(blob)
-        const a = document.createElement('a')
-        a.style.display = 'none'
+        const a = document.createElement("a")
+        a.style.display = "none"
         a.href = url
-        a.download = 'acta.docx'
+        a.download = "acta.docx"
         document.body.appendChild(a)
         a.click()
         window.URL.revokeObjectURL(url)
       } else {
-        alert('Error al generar el acta')
+        const errorData = await response.json()
+        console.error("Error response:", errorData)
+        alert(`Error al generar el acta: ${errorData.message}`)
       }
     } catch (error) {
-      console.error('Error:', error)
-      alert('Error al generar el acta')
+      console.error("Error:", error)
+      alert("Error al generar el acta")
     }
   }
 
-  const ordenDelDia = watch('ordenDelDia')
-  const asistentes = watch('asistentes')
+  const ordenDelDia = watch("ordenDelDia")
+  const asistentes = watch("asistentes")
 
   const addOrdenDelDia = () => {
     if (ordenDelDia.length < 10) {
-      setValue('ordenDelDia', [...ordenDelDia, ''])
+      setValue("ordenDelDia", [...ordenDelDia, ""])
     }
   }
 
   const removeOrdenDelDia = (index: number) => {
-    setValue('ordenDelDia', ordenDelDia.filter((_, i) => i !== index))
+    setValue(
+      "ordenDelDia",
+      ordenDelDia.filter((_, i) => i !== index),
+    )
   }
 
   const addAsistente = () => {
     if (asistentes.length < 5) {
-      setValue('asistentes', [...asistentes, ''])
-      setQueryAsistentes([...queryAsistentes, ''])
+      setValue("asistentes", [...asistentes, ""])
+      setQueryAsistentes([...queryAsistentes, ""])
     }
   }
 
   const removeAsistente = (index: number) => {
-    setValue('asistentes', asistentes.filter((_, i) => i !== index))
+    setValue(
+      "asistentes",
+      asistentes.filter((_, i) => i !== index),
+    )
     setQueryAsistentes(queryAsistentes.filter((_, i) => i !== index))
   }
 
@@ -175,53 +192,67 @@ export default function ActaForm() {
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
-          <label htmlFor="numeroActa" className="block text-sm font-medium text-gray-700">Número de Acta</label>
+          <label htmlFor="numeroActa" className="block text-sm font-medium text-gray-700">
+            Número de Acta
+          </label>
           <input
             type="text"
             id="numeroActa"
-            {...register('numeroActa', { required: true })}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+            {...register("numeroActa", { required: true })}
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 text-gray-900"
           />
         </div>
 
         {/* Fecha */}
         <div className="grid grid-cols-3 gap-2">
           <div>
-            <label htmlFor="fechaDia" className="block text-sm font-medium text-gray-700">Día</label>
+            <label htmlFor="fechaDia" className="block text-sm font-medium text-gray-700">
+              Día
+            </label>
             <select
               id="fechaDia"
-              {...register('fechaDia', { required: true })}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+              {...register("fechaDia", { required: true })}
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 text-gray-900"
             >
               <option value="">Seleccione</option>
               {dias.map((dia) => (
-                <option key={dia} value={dia}>{dia}</option>
+                <option key={dia} value={dia}>
+                  {dia}
+                </option>
               ))}
             </select>
           </div>
           <div>
-            <label htmlFor="fechaMes" className="block text-sm font-medium text-gray-700">Mes</label>
+            <label htmlFor="fechaMes" className="block text-sm font-medium text-gray-700">
+              Mes
+            </label>
             <select
               id="fechaMes"
-              {...register('fechaMes', { required: true })}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+              {...register("fechaMes", { required: true })}
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 text-gray-900"
             >
               <option value="">Seleccione</option>
               {meses.map((mes) => (
-                <option key={mes} value={mes}>{mes}</option>
+                <option key={mes} value={mes}>
+                  {mes}
+                </option>
               ))}
             </select>
           </div>
           <div>
-            <label htmlFor="fechaAno" className="block text-sm font-medium text-gray-700">Año</label>
+            <label htmlFor="fechaAno" className="block text-sm font-medium text-gray-700">
+              Año
+            </label>
             <select
               id="fechaAno"
-              {...register('fechaAno', { required: true })}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+              {...register("fechaAno", { required: true })}
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 text-gray-900"
             >
               <option value="">Seleccione</option>
               {anos.map((ano) => (
-                <option key={ano} value={ano}>{ano}</option>
+                <option key={ano} value={ano}>
+                  {ano}
+                </option>
               ))}
             </select>
           </div>
@@ -230,37 +261,47 @@ export default function ActaForm() {
         {/* Hora Inicial */}
         <div className="grid grid-cols-3 gap-2">
           <div>
-            <label htmlFor="horaInicial" className="block text-sm font-medium text-gray-700">Hora Inicial</label>
+            <label htmlFor="horaInicial" className="block text-sm font-medium text-gray-700">
+              Hora Inicial
+            </label>
             <select
               id="horaInicial"
-              {...register('horaInicial', { required: true })}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+              {...register("horaInicial", { required: true })}
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 text-gray-900"
             >
               <option value="">Seleccione</option>
               {horas.map((hora) => (
-                <option key={hora} value={hora}>{hora}</option>
+                <option key={hora} value={hora}>
+                  {hora}
+                </option>
               ))}
             </select>
           </div>
           <div>
-            <label htmlFor="minutoInicial" className="block text-sm font-medium text-gray-700">Minuto</label>
+            <label htmlFor="minutoInicial" className="block text-sm font-medium text-gray-700">
+              Minuto
+            </label>
             <select
               id="minutoInicial"
-              {...register('minutoInicial', { required: true })}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+              {...register("minutoInicial", { required: true })}
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 text-gray-900"
             >
               <option value="">Seleccione</option>
               {minutos.map((minuto) => (
-                <option key={minuto} value={minuto}>{minuto}</option>
+                <option key={minuto} value={minuto}>
+                  {minuto}
+                </option>
               ))}
             </select>
           </div>
           <div>
-            <label htmlFor="periodoInicial" className="block text-sm font-medium text-gray-700">AM/PM</label>
+            <label htmlFor="periodoInicial" className="block text-sm font-medium text-gray-700">
+              AM/PM
+            </label>
             <select
               id="periodoInicial"
-              {...register('periodoInicial', { required: true })}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+              {...register("periodoInicial", { required: true })}
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 text-gray-900"
             >
               <option value="">Seleccione</option>
               <option value="am">AM</option>
@@ -272,37 +313,47 @@ export default function ActaForm() {
         {/* Hora Final */}
         <div className="grid grid-cols-3 gap-2">
           <div>
-            <label htmlFor="horaFinal" className="block text-sm font-medium text-gray-700">Hora Final</label>
+            <label htmlFor="horaFinal" className="block text-sm font-medium text-gray-700">
+              Hora Final
+            </label>
             <select
               id="horaFinal"
-              {...register('horaFinal', { required: true })}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+              {...register("horaFinal", { required: true })}
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 text-gray-900"
             >
               <option value="">Seleccione</option>
               {horas.map((hora) => (
-                <option key={hora} value={hora}>{hora}</option>
+                <option key={hora} value={hora}>
+                  {hora}
+                </option>
               ))}
             </select>
           </div>
           <div>
-            <label htmlFor="minutoFinal" className="block text-sm font-medium text-gray-700">Minuto</label>
+            <label htmlFor="minutoFinal" className="block text-sm font-medium text-gray-700">
+              Minuto
+            </label>
             <select
               id="minutoFinal"
-              {...register('minutoFinal', { required: true })}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+              {...register("minutoFinal", { required: true })}
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 text-gray-900"
             >
               <option value="">Seleccione</option>
               {minutos.map((minuto) => (
-                <option key={minuto} value={minuto}>{minuto}</option>
+                <option key={minuto} value={minuto}>
+                  {minuto}
+                </option>
               ))}
             </select>
           </div>
           <div>
-            <label htmlFor="periodoFinal" className="block text-sm font-medium text-gray-700">AM/PM</label>
+            <label htmlFor="periodoFinal" className="block text-sm font-medium text-gray-700">
+              AM/PM
+            </label>
             <select
               id="periodoFinal"
-              {...register('periodoFinal', { required: true })}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+              {...register("periodoFinal", { required: true })}
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 text-gray-900"
             >
               <option value="">Seleccione</option>
               <option value="am">AM</option>
@@ -312,7 +363,9 @@ export default function ActaForm() {
         </div>
 
         <div>
-          <label htmlFor="comuna" className="block text-sm font-medium text-gray-700">Comuna</label>
+          <label htmlFor="comuna" className="block text-sm font-medium text-gray-700">
+            Comuna
+          </label>
           <Controller
             name="comuna"
             control={control}
@@ -320,7 +373,7 @@ export default function ActaForm() {
               <Combobox value={field.value} onChange={field.onChange}>
                 <div className="relative mt-1">
                   <Combobox.Input
-                    className="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                    className="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 text-gray-900"
                     onChange={(event) => {
                       setQueryComuna(event.target.value)
                       field.onChange(event.target.value)
@@ -333,7 +386,7 @@ export default function ActaForm() {
                         value={comuna}
                         className={({ active }) =>
                           `relative cursor-default select-none py-2 pl-10 pr-4 ${
-                            active ? 'bg-indigo-600 text-white' : 'text-gray-900'
+                            active ? "bg-indigo-600 text-white" : "text-gray-900"
                           }`
                         }
                       >
@@ -348,7 +401,9 @@ export default function ActaForm() {
         </div>
 
         <div>
-          <label htmlFor="lugar" className="block text-sm font-medium text-gray-700">Lugar</label>
+          <label htmlFor="lugar" className="block text-sm font-medium text-gray-700">
+            Lugar
+          </label>
           <Controller
             name="lugar"
             control={control}
@@ -356,7 +411,7 @@ export default function ActaForm() {
               <Combobox value={field.value} onChange={field.onChange}>
                 <div className="relative mt-1">
                   <Combobox.Input
-                    className="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                    className="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 text-gray-900"
                     onChange={(event) => {
                       setQueryLugar(event.target.value)
                       field.onChange(event.target.value)
@@ -369,7 +424,7 @@ export default function ActaForm() {
                         value={lugar}
                         className={({ active }) =>
                           `relative cursor-default select-none py-2 pl-10 pr-4 ${
-                            active ? 'bg-indigo-600 text-white' : 'text-gray-900'
+                            active ? "bg-indigo-600 text-white" : "text-gray-900"
                           }`
                         }
                       >
@@ -385,12 +440,14 @@ export default function ActaForm() {
       </div>
 
       <div>
-        <label htmlFor="objetivo" className="block text-sm font-medium text-gray-700">Objetivo</label>
+        <label htmlFor="objetivo" className="block text-sm font-medium text-gray-700">
+          Objetivo
+        </label>
         <input
           type="text"
           id="objetivo"
-          {...register('objetivo')}
-          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+          {...register("objetivo")}
+          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 text-gray-900"
         />
       </div>
 
@@ -402,7 +459,7 @@ export default function ActaForm() {
             <input
               type="text"
               {...register(`ordenDelDia.${index}` as const)}
-              className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 text-gray-900"
             />
             {index > 0 && (
               <button type="button" onClick={() => removeOrdenDelDia(index)} className="ml-2">
@@ -419,11 +476,13 @@ export default function ActaForm() {
       </div>
 
       <div>
-        <label htmlFor="desarrollo" className="block text-sm font-medium text-gray-700">Desarrollo</label>
+        <label htmlFor="desarrollo" className="block text-sm font-medium text-gray-700">
+          Desarrollo
+        </label>
         <textarea
           id="desarrollo"
-          {...register('desarrollo')}
-          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+          {...register("desarrollo")}
+          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 text-gray-900"
           rows={6}
         ></textarea>
       </div>
@@ -439,12 +498,12 @@ export default function ActaForm() {
                 <Combobox value={field.value} onChange={field.onChange}>
                   <div className="relative w-full">
                     <Combobox.Input
-                      className="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                      className="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 text-gray-900"
                       onChange={(event) => {
-                        const newQueryAsistentes = [...queryAsistentes];
-                        newQueryAsistentes[index] = event.target.value;
-                        setQueryAsistentes(newQueryAsistentes);
-                        field.onChange(event.target.value);
+                        const newQueryAsistentes = [...queryAsistentes]
+                        newQueryAsistentes[index] = event.target.value
+                        setQueryAsistentes(newQueryAsistentes)
+                        field.onChange(event.target.value)
                       }}
                     />
                     <Combobox.Options className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
@@ -454,7 +513,7 @@ export default function ActaForm() {
                           value={asistente}
                           className={({ active }) =>
                             `relative cursor-default select-none py-2 pl-10 pr-4 ${
-                              active ? 'bg-indigo-600 text-white' : 'text-gray-900'
+                              active ? "bg-indigo-600 text-white" : "text-gray-900"
                             }`
                           }
                         >
